@@ -1,11 +1,1 @@
-{
-    "tache":[
-        "lessive",
-        "vaisselle",
-        "menage",
-        "cuisiner",
-        "courses"],
-    "archive":[
-        
-    ]
-}
+{"tache":["lessive","vaisselle","menage","cuisiner","courses","magasins"],"archive":[]}

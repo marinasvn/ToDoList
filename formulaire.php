@@ -51,8 +51,65 @@
     </div>
     
     <script src="jquery-3.2.1.min.js"></script>
+    <!--<script>
+        $(document).ready(function() {
+            $("input[type=checkbox]").change(function() {
+                var checked = $(this).val();
+                $.getJSON('todo.json', function(data) {
+                    var taches = data['tache'];
+                    var archives = data['archive'];
+                    for (var i=0; i<=taches.length; i++) {
+                        if (checked == taches[i]) {
+                            archives.push(taches[i]);
+                            var removeItem = taches[i];
+                            taches.splice($.inArray(removeItem, taches), 1);
+                            console.log(taches);
+                            console.log(archives);
+                        }
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: "todo.json",
+                        dataType: "json",
+                        data: JSON.stringify(taches)
+                    });
+                    
+                });
+            });
+        });
+    </script>-->
     <script>
-        
+        $(document).ready(function() {
+            $("input[type=checkbox]").change(function() {
+                var checked = $(this).val();
+                $.getJSON('todo.json', function(data) {
+                                var taches = data['tache'];
+                                var archives = data['archive'];
+                                for (var i=0; i<=taches.length; i++) {
+                                    if (checked == taches[i]) {
+                                        archives.push(taches[i]);
+                                        var removeItem = taches[i];
+                                        taches.splice($.inArray(removeItem, taches), 1);
+                                        console.log(taches);
+                                        console.log(archives);
+                                    }
+                                }
+                    var obj = {'tache':taches, 'archive':archives};
+                    console.log(obj);
+                    $.ajax({
+                            url: "todo.json",
+                            type: "POST",
+                            async: true,
+                            dataType: "json",
+                            data: JSON.stringify(obj),
+                            success: function() {
+                                console.log("ok");
+                            }
+                    });
+                });
+                
+            });
+        });
     </script>
 </body>
 </html>
