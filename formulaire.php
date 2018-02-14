@@ -25,39 +25,26 @@
   <div id="list">
       <div id="a-faire">
         <p class="h3">A FAIRE</p>
-        <form>
+        <form method="post">
             <?php
                 foreach ($content_json_Decoded['tache'] as $item) {
-                    echo "<label for='tache'><input type='checkbox' name='tache[]' value='".$item."' /><span>".$item."</span></label><br/>";
-                }
-            
-                if (isset($_POST['tache'])){
-                    $archive = $_POST['tache'];
-
-                    // on ajoute la tache dans le tableau data
-                    foreach ($archive['tache'] as $item) {
-                        echo "<p>".$item."</p>";
-                        $content_json_Decoded["archive"][] = $item;
-                    };
-
-
-                    // Encode the array back into a JSON string
-                    $content_json_Encoded = json_encode($content_json_Decoded);
-                    // Save the file
-                    file_put_contents('todo.json', $content_json_Encoded);
-
+                    echo "<label for='tache'><input type='checkbox' name='task[]' value='".$item."' /><span>".$item."</span></label><br/>";
                 }
             ?>
             <br/>
-            <!--<input type="submit" name="submit" value="Enregister">-->
+            <!--<input type="submit" value="ok">-->
         </form>
     </div>
     
     <div id="done">
         <p class="h3">DONE</p>
-        <form>
-
-        </form>
+        <ul>
+            <?php
+                foreach ($content_json_Decoded['archive'] as $item) {
+                    echo "<li>".$item."</li>";
+                }
+            ?>
+        </ul>
     </div>
   </div>
 
@@ -70,9 +57,9 @@
     </div>
     
     
-<!--<script src="jquery-3.2.1.min.js"></script>-->
+<script src="jquery-3.2.1.min.js"></script>
 
-<!--  <script>
+ <!-- <script>
         $(document).ready(function() {
             $("input[type=checkbox]").change(function() {
                 var checked = $(this).val();
@@ -112,17 +99,53 @@
                     }); 
             });
         });
-    </script> -->
+    </script>-->
+ <script>
+        $(document).ready(function() {
+            $("input[type=checkbox]").change(function() {
+                var checked = $(this).val();
+                
+                    $.ajax({
+                        type: "POST",
+                        url: "todo.json",
+                        beforeSend: function(xhr){
+                            if (xhr.overrideMimeType)
+                            {
+                              xhr.overrideMimeType("application/json");
+                            }
+                        },
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        success: function (data) {
+                            var json = data;
+                            
+                            var taches = json["tache"];
+                            var archives = json["archive"];
+                            for (var i=0; i<taches.length; i++) {
+                                    if (checked == taches[i]) {
+                                        var removeItem = taches[i];
+                                        
+                                        archives.push(taches[i]);
+                                        taches.splice($.inArray(removeItem, taches), 1);
+                                        json = JSON.stringify({'tache':taches, 'archive':archives});
+                                    }
+                             }
+                            console.log(json);
+                        }
+                    }); 
+            });
+        });
+</script>   
 <!--  <script>
         $(document).ready(function() {
             $("input[type=checkbox]").change(function() {
                 var checked = $(this).val();
                 
-                $.getJSON('todo.json', {}, function (data) {
+                $.post('todo.json', function(data) {
                     var json = data;
                             
-                            var taches = json["tache"];
-                            var archives = json["archive"];
+                            var taches = json.tache;
+                            var archives = json.archive;
                             for (var i=0; i<taches.length; i++) {
                                     if (checked == taches[i]) {
                                         var removeItem = taches[i];
@@ -133,11 +156,21 @@
                                     }
                              }
                      console.log(json);
-                });
+                }, "json");
             });
         });
     </script> -->
 
+
+<?php
+    
+print_r($_REQUEST);
+// Encode.
+$content_json_Encoded = json_encode($content_json_Decoded);
+// Save
+file_put_contents('todo.json',$content_json_Encoded);
+    
+?>
 
 </body>
 </html>
