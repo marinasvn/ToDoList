@@ -1,8 +1,10 @@
 <?php
     // Load the file
     $content_todo_json = file_get_contents('todo.json');
+
     // Decode the JSON data into a PHP array.
     $content_json_Decoded = json_decode($content_todo_json, true);
+    
 ?>
 
 <!DOCTYPE html>
@@ -23,10 +25,27 @@
   <div id="list">
       <div id="a-faire">
         <p class="h3">A FAIRE</p>
-        <form action="contenu.php" method="POST">
+        <form>
             <?php
                 foreach ($content_json_Decoded['tache'] as $item) {
-                    echo "<label for='tache'><input type='checkbox' name='tache' value='".$item."' /><span>".$item."</span></label><br/>";
+                    echo "<label for='tache'><input type='checkbox' name='tache[]' value='".$item."' /><span>".$item."</span></label><br/>";
+                }
+            
+                if (isset($_POST['tache'])){
+                    $archive = $_POST['tache'];
+
+                    // on ajoute la tache dans le tableau data
+                    foreach ($archive['tache'] as $item) {
+                        echo "<p>".$item."</p>";
+                        $content_json_Decoded["archive"][] = $item;
+                    };
+
+
+                    // Encode the array back into a JSON string
+                    $content_json_Encoded = json_encode($content_json_Decoded);
+                    // Save the file
+                    file_put_contents('todo.json', $content_json_Encoded);
+
                 }
             ?>
             <br/>
@@ -34,9 +53,9 @@
         </form>
     </div>
     
-    <div id="archive">
-        <p class="h3">ARCHIVE</p>
-        <form action="formulaire.php" method="POST">
+    <div id="done">
+        <p class="h3">DONE</p>
+        <form>
 
         </form>
     </div>
@@ -50,66 +69,75 @@
            </form>
     </div>
     
-    <script src="jquery-3.2.1.min.js"></script>
-    <!--<script>
+    
+<!--<script src="jquery-3.2.1.min.js"></script>-->
+
+<!--  <script>
         $(document).ready(function() {
             $("input[type=checkbox]").change(function() {
                 var checked = $(this).val();
-                $.getJSON('todo.json', function(data) {
-                    var taches = data['tache'];
-                    var archives = data['archive'];
-                    for (var i=0; i<=taches.length; i++) {
-                        if (checked == taches[i]) {
-                            archives.push(taches[i]);
-                            var removeItem = taches[i];
-                            taches.splice($.inArray(removeItem, taches), 1);
-                            console.log(taches);
-                            console.log(archives);
-                        }
-                    }
-                    $.ajax({
-                        type: "POST",
-                        url: "todo.json",
-                        dataType: "json",
-                        data: JSON.stringify(taches)
-                    });
-                    
-                });
-            });
-        });
-    </script>-->
-    <script>
-        $(document).ready(function() {
-            $("input[type=checkbox]").change(function() {
-                var checked = $(this).val();
-                $.getJSON('todo.json', function(data) {
-                                var taches = data['tache'];
-                                var archives = data['archive'];
-                                for (var i=0; i<=taches.length; i++) {
-                                    if (checked == taches[i]) {
-                                        archives.push(taches[i]);
-                                        var removeItem = taches[i];
-                                        taches.splice($.inArray(removeItem, taches), 1);
-                                        console.log(taches);
-                                        console.log(archives);
-                                    }
-                                }
-                    var obj = {'tache':taches, 'archive':archives};
-                    console.log(obj);
-                    $.ajax({
-                            url: "todo.json",
-                            type: "POST",
-                            async: true,
-                            dataType: "json",
-                            data: JSON.stringify(obj),
-                            success: function() {
-                                console.log("ok");
-                            }
-                    });
-                });
                 
+                    $.ajax({
+                        method: "GET",
+                        url: "todo.json",
+                        beforeSend: function(xhr){
+                            if (xhr.overrideMimeType)
+                            {
+                              xhr.overrideMimeType("application/json");
+                            }
+                        },
+                        dataType: "json",
+                        mimeType: "textPlain",
+                        sync: true,
+                        contentType: "application/json; charset=utf-8",
+                        success: function (data) {
+                            var json = data;
+                            
+                            var taches = json["tache"];
+                            var archives = json["archive"];
+                            for (var i=0; i<taches.length; i++) {
+                                    if (checked == taches[i]) {
+                                        var removeItem = taches[i];
+                                        
+                                        archives.push(taches[i]);
+                                        taches.splice($.inArray(removeItem, taches), 1);
+                                        json = {'tache':taches, 'archive':archives};
+                                    }
+                             }
+                            console.log(json);
+                        },
+                        error: function(xhr, status, error) {
+                            alert(xhr.responseText + '|\n' + status + '|\n' +error);
+                        }
+                    }); 
             });
         });
-    </script>
+    </script> -->
+<!--  <script>
+        $(document).ready(function() {
+            $("input[type=checkbox]").change(function() {
+                var checked = $(this).val();
+                
+                $.getJSON('todo.json', {}, function (data) {
+                    var json = data;
+                            
+                            var taches = json["tache"];
+                            var archives = json["archive"];
+                            for (var i=0; i<taches.length; i++) {
+                                    if (checked == taches[i]) {
+                                        var removeItem = taches[i];
+                                        
+                                        archives.push(taches[i]);
+                                        taches.splice($.inArray(removeItem, taches), 1);
+                                        json = {'tache':taches, 'archive':archives};
+                                    }
+                             }
+                     console.log(json);
+                });
+            });
+        });
+    </script> -->
+
+
 </body>
 </html>
