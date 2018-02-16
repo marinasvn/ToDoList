@@ -1,11 +1,3 @@
-<?php
-    // Load the file
-    $content_todo_json = file_get_contents('todo.json');
-
-    // Decode the JSON data into a PHP array.
-    $content_json_Decoded = json_decode($content_todo_json, true);
-    
-?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -21,156 +13,95 @@
     </style>
 </head>
 <body>
- 
-  <div id="list">
+
+<div id="list">
       <div id="a-faire">
-        <p class="h3">A FAIRE</p>
+        <p class="h3">TO DO</p>
         <form method="post">
-            <?php
-                foreach ($content_json_Decoded['tache'] as $item) {
-                    echo "<label for='tache'><input type='checkbox' name='task[]' value='".$item."' /><span>".$item."</span></label><br/>";
-                }
-            ?>
-            <br/>
-            <!--<input type="submit" value="ok">-->
+
         </form>
     </div>
     
     <div id="done">
         <p class="h3">DONE</p>
-        <ul>
-            <?php
-                foreach ($content_json_Decoded['archive'] as $item) {
-                    echo "<li>".$item."</li>";
-                }
-            ?>
-        </ul>
+
     </div>
   </div>
 
-    <div id="ajouter">
+	<div id="ajouter">
         <p class="h2">AJOUTER UNE TACHE</p>
            <form action="contenu.php" method="POST">
                 <input type="text" name="tache" placeholder="La tâche à effectuer">
                 <input type="submit" name="submit" value="Ajouter" id="add">
            </form>
     </div>
-    
-    
-<script src="jquery-3.2.1.min.js"></script>
-
- <!-- <script>
-        $(document).ready(function() {
-            $("input[type=checkbox]").change(function() {
-                var checked = $(this).val();
-                
-                    $.ajax({
-                        method: "GET",
-                        url: "todo.json",
-                        beforeSend: function(xhr){
-                            if (xhr.overrideMimeType)
-                            {
-                              xhr.overrideMimeType("application/json");
-                            }
-                        },
-                        dataType: "json",
-                        mimeType: "textPlain",
-                        sync: true,
-                        contentType: "application/json; charset=utf-8",
-                        success: function (data) {
-                            var json = data;
-                            
-                            var taches = json["tache"];
-                            var archives = json["archive"];
-                            for (var i=0; i<taches.length; i++) {
-                                    if (checked == taches[i]) {
-                                        var removeItem = taches[i];
-                                        
-                                        archives.push(taches[i]);
-                                        taches.splice($.inArray(removeItem, taches), 1);
-                                        json = {'tache':taches, 'archive':archives};
-                                    }
-                             }
-                            console.log(json);
-                        },
-                        error: function(xhr, status, error) {
-                            alert(xhr.responseText + '|\n' + status + '|\n' +error);
-                        }
-                    }); 
-            });
-        });
-    </script>-->
- <script>
-        $(document).ready(function() {
-            $("input[type=checkbox]").change(function() {
-                var checked = $(this).val();
-                
-                    $.ajax({
-                        type: "POST",
-                        url: "todo.json",
-                        beforeSend: function(xhr){
-                            if (xhr.overrideMimeType)
-                            {
-                              xhr.overrideMimeType("application/json");
-                            }
-                        },
-                        dataType: "json",
-                        contentType: "application/json; charset=utf-8",
-                        success: function (data) {
-                            var json = data;
-                            
-                            var taches = json["tache"];
-                            var archives = json["archive"];
-                            for (var i=0; i<taches.length; i++) {
-                                    if (checked == taches[i]) {
-                                        var removeItem = taches[i];
-                                        
-                                        archives.push(taches[i]);
-                                        taches.splice($.inArray(removeItem, taches), 1);
-                                        json = JSON.stringify({'tache':taches, 'archive':archives});
-                                    }
-                             }
-                            console.log(json);
-                        }
-                    }); 
-            });
-        });
-</script>   
-<!--  <script>
-        $(document).ready(function() {
-            $("input[type=checkbox]").change(function() {
-                var checked = $(this).val();
-                
-                $.post('todo.json', function(data) {
-                    var json = data;
-                            
-                            var taches = json.tache;
-                            var archives = json.archive;
-                            for (var i=0; i<taches.length; i++) {
-                                    if (checked == taches[i]) {
-                                        var removeItem = taches[i];
-                                        
-                                        archives.push(taches[i]);
-                                        taches.splice($.inArray(removeItem, taches), 1);
-                                        json = {'tache':taches, 'archive':archives};
-                                    }
-                             }
-                     console.log(json);
-                }, "json");
-            });
-        });
-    </script> -->
 
 
-<?php
-    
-print_r($_REQUEST);
-// Encode.
-$content_json_Encoded = json_encode($content_json_Decoded);
-// Save
-file_put_contents('todo.json',$content_json_Encoded);
-    
-?>
+	<script src="jquery-3.3.1.min.js"></script>
+
+	<script>
+		var xmlhttp = new XMLHttpRequest();
+        xmlhttp.overrideMimeType("application/json");
+		xmlhttp.open("POST", "todo.json", true);
+		xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+		
+		xmlhttp.onreadystatechange = function() {
+		    if (this.readyState == 4 && this.status == 200) {
+		        var myObj = JSON.parse(this.responseText);
+
+		        for (var i=0; i < myObj['tache'].length; i++) {
+		        	/*$("#a-faire").append("<li>"+myObj['tache'][i]+"</li>");*/
+                    $("#a-faire").append("<label for='task"+i+"'><input type='checkbox' name='tache' value='false' id='task"+i+"' /><span>"+myObj['tache'][i]+"</span></label><br/>");
+		        }
+
+		        for (var j=0; j < myObj['done'].length; j++) {
+		        	$("#done").append("<p>"+myObj['done'][j]+"</p><br/>");
+		        }
+
+		        $("input[type=checkbox]").change(function() {
+                    if ($(this).is(':checked')) {
+                            $(this).attr('value', 'true');
+                            var selected = $("label[for='" +this.id +"']").text();
+                            console.log(selected);
+                        
+                            myObj['done'].push(selected);
+
+                            myObj['tache'].splice($.inArray(selected, myObj['tache']), 1);
+                            console.log(myObj);
+                        
+                            var test = myObj;
+                        
+                            $.ajax ({
+                                type: "POST",
+                                url: "traitement.php",
+                                beforeSend: function(xhr){
+                                    if (xhr.overrideMimeType)
+                                    {
+                                      xhr.overrideMimeType("application/json");
+                                    }
+                                },
+                                data: {test},
+                                dataType: "json",
+                                success: function() {
+                                    console.log("ok");
+                                }
+                                
+                            });
+                        location.reload();
+                            
+                    } else {
+                        $(this).attr('value','false');
+                    }
+                    
+		        });
+		        	
+		    }
+		};
+		
+		xmlhttp.send();
+        
+        
+	</script>
 
 </body>
 </html>
