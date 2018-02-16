@@ -1,3 +1,6 @@
+<?php
+    /*setcookie("$list", time()+365*24*3600);*/
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -10,6 +13,19 @@
         :checked + span {
             text-decoration: line-through;
         }
+        
+        #list, #ajouter {
+            width: 200px;
+            height: auto;
+            padding: 20px;
+            margin: 0 auto;
+            border: 1px dotted black;
+            border-radius: 20px;
+        }
+        #ajouter {
+            margin-top: 10px;
+        }
+        
     </style>
 </head>
 <body>
@@ -17,14 +33,16 @@
 <div id="list">
       <div id="a-faire">
         <p class="h3">TO DO</p>
-        <form method="post">
+        <ul id="sortable">
 
-        </form>
+        </ul>
     </div>
     
     <div id="done">
         <p class="h3">DONE</p>
-
+        <ul>
+            
+        </ul>
     </div>
   </div>
 
@@ -38,6 +56,7 @@
 
 
 	<script src="jquery-3.3.1.min.js"></script>
+	<script src="jquery-ui.min.js"></script>
 
 	<script>
 		var xmlhttp = new XMLHttpRequest();
@@ -51,12 +70,64 @@
 
 		        for (var i=0; i < myObj['tache'].length; i++) {
 		        	/*$("#a-faire").append("<li>"+myObj['tache'][i]+"</li>");*/
-                    $("#a-faire").append("<label for='task"+i+"'><input type='checkbox' name='tache' value='false' id='task"+i+"' /><span>"+myObj['tache'][i]+"</span></label><br/>");
+                    $("#sortable").append("<li><label for='task"+i+"'><input type='checkbox' name='tache' value='false' id='task"+i+"' /><span>"+myObj['tache'][i]+"</span></label></li>");
 		        }
 
 		        for (var j=0; j < myObj['done'].length; j++) {
-		        	$("#done").append("<p>"+myObj['done'][j]+"</p><br/>");
+		        	$("#done ul").append("<li>"+myObj['done'][j]+"</li>");
 		        }
+                
+                /*$("#sortable").sortable();
+                var newList = $("#sortable li label span");
+                var doneActuel = $("#done ul li");
+                
+                var newTaches = [];
+                var newDone = [];
+                
+                for (k=0; k < newList.length; k++) {
+                    newTaches.push(newList[k].innerHTML);
+                }
+                for (f=0; f < doneActuel.length; f++) {
+                    newDone.push(doneActuel[f].innerHTML);
+                }
+                var newObject = {"tache":newTaches,"done":newDone};
+                console.log(JSON.stringify(newObject));*/
+                $("#sortable").sortable({
+                    update: function() {
+                        var newList = $("#sortable li label span");
+                        var doneActuel = $("#done ul li");
+
+                        var newTaches = [];
+                        var newDone = [];
+
+                        for (k=0; k < newList.length; k++) {
+                            newTaches.push(newList[k].innerHTML);
+                        }
+                        for (f=0; f < doneActuel.length; f++) {
+                            newDone.push(doneActuel[f].innerHTML);
+                        }
+                        var newObject = {"tache":newTaches,"done":newDone};
+                        console.log(newObject);
+                        
+                        $.ajax ({
+                            type: "POST",
+                            url: "traitement1.php",
+                            beforeSend: function(xhr){
+                                    if (xhr.overrideMimeType)
+                                    {
+                                      xhr.overrideMimeType("application/json");
+                                    }
+                                },
+                            data: {newObject},
+                            dataType: "json",
+                            success: function() {
+                                    console.log("ok");
+                            }
+                        });
+                    }
+                });
+                
+                
 
 		        $("input[type=checkbox]").change(function() {
                     if ($(this).is(':checked')) {
@@ -82,12 +153,15 @@
                                 },
                                 data: {test},
                                 dataType: "json",
+                                complete: function() {
+                                    location.reload();
+                                },
                                 success: function() {
                                     console.log("ok");
                                 }
                                 
                             });
-                        location.reload();
+                        /*location.reload();*/
                             
                     } else {
                         $(this).attr('value','false');
