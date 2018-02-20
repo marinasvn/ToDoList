@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <title>To Do list</title>
-    
+    <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
     
     <style>
         :checked + span {
@@ -25,6 +25,12 @@
         #ajouter {
             margin-top: 10px;
         }
+        
+        li {
+            list-style: none;
+            display: flex;
+        }
+        a {margin: 0 10px 0 0; padding: 0;}
         
     </style>
 </head>
@@ -67,31 +73,20 @@
 		xmlhttp.onreadystatechange = function() {
 		    if (this.readyState == 4 && this.status == 200) {
 		        var myObj = JSON.parse(this.responseText);
+                
+                if (myObj['tache'] === undefined) {
+                     myObj['tache'] = [];
+                }
 
 		        for (var i=0; i < myObj['tache'].length; i++) {
-		        	/*$("#a-faire").append("<li>"+myObj['tache'][i]+"</li>");*/
-                    $("#sortable").append("<li><label for='task"+i+"'><input type='checkbox' name='tache' value='false' id='task"+i+"' /><span>"+myObj['tache'][i]+"</span></label></li>");
+
+                    $("#sortable").append("<li><label for='task"+i+"'><i class='fas fa-pencil-alt'></i><input type='checkbox' name='tache' value='false' id='task"+i+"' /><span>"+myObj['tache'][i]+"</span></label></li>");
 		        }
 
 		        for (var j=0; j < myObj['done'].length; j++) {
-		        	$("#done ul").append("<li>"+myObj['done'][j]+"</li>");
+		        	$("#done ul").append("<li><a class='up'><i class='fas fa-arrow-up'></i></a><a class='del'><i class='far fa-trash-alt'></i></a>"+myObj['done'][j]+"</li>");
 		        }
-                
-                /*$("#sortable").sortable();
-                var newList = $("#sortable li label span");
-                var doneActuel = $("#done ul li");
-                
-                var newTaches = [];
-                var newDone = [];
-                
-                for (k=0; k < newList.length; k++) {
-                    newTaches.push(newList[k].innerHTML);
-                }
-                for (f=0; f < doneActuel.length; f++) {
-                    newDone.push(doneActuel[f].innerHTML);
-                }
-                var newObject = {"tache":newTaches,"done":newDone};
-                console.log(JSON.stringify(newObject));*/
+
                 $("#sortable").sortable({
                     update: function() {
                         var newList = $("#sortable li label span");
@@ -133,14 +128,14 @@
                     if ($(this).is(':checked')) {
                             $(this).attr('value', 'true');
                             var selected = $("label[for='" +this.id +"']").text();
-                            console.log(selected);
-                        
-                            myObj['done'].push(selected);
 
-                            myObj['tache'].splice($.inArray(selected, myObj['tache']), 1);
-                            console.log(myObj);
-                        
-                            var test = myObj;
+                            myObj['done'].push(selected);
+                            var d = myObj['tache'].indexOf(selected);
+                            myObj['tache'].splice(d, 1);
+                            
+                                var test = myObj;
+                                console.log(test);
+
                         
                             $.ajax ({
                                 type: "POST",
@@ -168,8 +163,76 @@
                     }
                     
 		        });
-		        	
+                
+                $(".up").click(function() {
+                   var t = $(this).parent().text();
+                    console.log(t);
+                    
+                     myObj['tache'].push(t);
+                     var up = myObj['done'].indexOf(t);
+                     myObj['done'].splice(up, 1);
+                    console.log(myObj);
+                    
+                     var test = myObj;
+                     console.log(test);
+
+                        
+                            $.ajax ({
+                                type: "POST",
+                                url: "traitement.php",
+                                beforeSend: function(xhr){
+                                    if (xhr.overrideMimeType)
+                                    {
+                                      xhr.overrideMimeType("application/json");
+                                    }
+                                },
+                                data: {test},
+                                dataType: "json",
+                                complete: function() {
+                                    location.reload();
+                                },
+                                success: function() {
+                                    console.log("ok");
+                                }
+                                
+                            });
+                });
+                
+                $(".del").click(function() {
+                   var t = $(this).parent().text();
+                    console.log(t);
+                    
+                     var del = myObj['done'].indexOf(t);
+                     myObj['done'].splice(del, 1);
+                    console.log(myObj);
+                    
+                     var test = myObj;
+                     console.log(test);
+
+                        
+                            $.ajax ({
+                                type: "POST",
+                                url: "traitement.php",
+                                beforeSend: function(xhr){
+                                    if (xhr.overrideMimeType)
+                                    {
+                                      xhr.overrideMimeType("application/json");
+                                    }
+                                },
+                                data: {test},
+                                dataType: "json",
+                                complete: function() {
+                                    location.reload();
+                                },
+                                success: function() {
+                                    console.log("ok");
+                                }
+                                
+                            });
+                });
+		        
 		    }
+            
 		};
 		
 		xmlhttp.send();
