@@ -98,6 +98,14 @@
             border-bottom: 1px solid #000;
         }
         #todo::placeholder {padding-left: 5px;}
+        
+        
+        input.cache {
+            border-top: 0px;
+            border-right: 0px;
+            border-left: 0px;
+            border-bottom: 1px solid #000;
+        }
     </style>
 </head>
 <body>
@@ -127,6 +135,7 @@
     </div>
 
 </div>
+    
 	<script src="jquery-3.3.1.min.js"></script>
 	<script src="jquery-ui.min.js"></script>
 
@@ -149,7 +158,7 @@
 
 		        for (var i=0; i < myObj['tache'].length; i++) {
 
-                    $("#sortable").append("<li><a class='edit'><i class='fas fa-pencil-alt'></i></a><label for='task"+i+"'><input type='checkbox' name='tache' value='false' id='task"+i+"' /><span>"+myObj['tache'][i]+"</span></label><input type='text' size='10' maxlength='60' placeholder='"+myObj['tache'][i]+"' class='cache' /></li>");
+                    $("#sortable").append("<li><a class='edit'><i class='fas fa-pencil-alt'></i></a><label for='task"+i+"'><input type='checkbox' name='tache' value='false' id='task"+i+"' /><span>"+myObj['tache'][i]+"</span></label><input type='text' size='10' maxlength='60' placeholder='"+myObj['tache'][i]+"' class='cache' /><a class='cache' id='exit'><i class='fas fa-times-circle'></i></a></li>");
 		        }
 
 		        for (var j=0; j < myObj['done'].length; j++) {
@@ -344,9 +353,6 @@
                                 },
                             data: {newObject},
                             dataType: "json",
-                            complete: function() {
-                                    location.reload();
-                                },
                             success: function() {
                                     console.log("ok");
                             }
@@ -354,6 +360,12 @@
                     });
                 });
 		        
+                $("a#exit").click(function() {
+                    $(this).parent().find("input.cache").css('display','none');
+                    $(this).css('display','none');
+                    $(this).parent().find("span").css('display','inline');
+                    
+                });
 		    }
             
 		};
