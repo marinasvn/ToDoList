@@ -8,8 +8,21 @@
     <meta charset="UTF-8">
     <title>To Do list</title>
     <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
     
     <style>
+        #container {
+            width: 250px;
+            height: auto;
+            border: 1px solid black;
+            border-radius: 20px;
+            padding: 10px 5px;
+            margin: 0 auto;
+            background-color: #ccc;
+  
+        }
+        * {font-family: 'Indie Flower', cursive;}
+        
         :checked + span {
             text-decoration: line-through;
         }
@@ -21,6 +34,7 @@
             margin: 0 auto;
             border: 1px dotted black;
             border-radius: 20px;
+            background-color: #fff;
         }
         #ajouter {
             margin-top: 10px;
@@ -32,6 +46,7 @@
         }
         a {margin: 0 10px 0 0; padding: 0;}
         
+        
         input[type="text"] {
             padding: 2px !important;
             height: 20px;
@@ -41,10 +56,52 @@
             display: none;
         }
         
+        #sortable {
+            position: relative;
+        }
+        #sortable label span {margin-left: 10px;}
+        #sortable label:before {
+            border: 2px solid #000;
+              border-top: none;
+              border-right: none;
+              content: "";
+              height: 6px;
+              transform: rotate(-45deg);
+              width: 12px;
+            position: absolute;
+            margin-top: 4px;
+        }
+
+        
+        #sortable input[type="checkbox"] {
+          visibility: hidden;
+        }
+        
+        #sortable input[type="checkbox"]:checked + label {
+          background-color: transparent;
+          border-color: #ccc;
+        }
+        
+        input[type="submit"] {
+            background-color: transparent;
+            border: 1px solid #000;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            padding-top: 5px;
+        }
+        
+        #todo {
+            border-top: 0px;
+            border-right: 0px;
+            border-left: 1px solid #000;
+            border-bottom: 1px solid #000;
+        }
+        #todo::placeholder {padding-left: 5px;}
     </style>
 </head>
 <body>
-
+<div id="container">
 <div id="list">
       <div id="a-faire">
         <p class="h3">TO DO</p>
@@ -62,14 +119,14 @@
   </div>
 
 	<div id="ajouter">
-        <p class="h2">AJOUTER UNE TACHE</p>
+        <p class="h2">ADD A TASK</p>
            <form action="contenu.php" method="POST">
-                <input type="text" name="tache" placeholder="La tâche à effectuer">
-                <input type="submit" name="submit" value="Ajouter" id="add">
+                <input type="text" name="tache" placeholder="Task to do" id="todo">
+                <input type="submit" name="submit" value="Add" id="add">
            </form>
     </div>
 
-
+</div>
 	<script src="jquery-3.3.1.min.js"></script>
 	<script src="jquery-ui.min.js"></script>
 
@@ -139,6 +196,7 @@
 		        $("input[type=checkbox]").change(function() {
                     if ($(this).is(':checked')) {
                             $(this).attr('value', 'true');
+                        
                             var selected = $("label[for='" +this.id +"']").text();
 
                             myObj['done'].push(selected);
