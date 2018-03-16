@@ -1,7 +1,3 @@
-<?php
-    /*setcookie("$list", time()+365*24*3600);*/
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -155,24 +151,18 @@
                 if (myObj['done'] === undefined) {
                      myObj['done'] = [];
                 }
-
 		        for (var i=0; i < myObj['tache'].length; i++) {
-
                     $("#sortable").append("<li><a class='edit'><i class='fas fa-pencil-alt'></i></a><label for='task"+i+"'><input type='checkbox' name='tache' value='false' id='task"+i+"' /><span>"+myObj['tache'][i]+"</span></label><input type='text' size='10' maxlength='60' placeholder='"+myObj['tache'][i]+"' class='cache' /><a class='cache' id='exit'><i class='fas fa-times-circle'></i></a></li>");
 		        }
-
 		        for (var j=0; j < myObj['done'].length; j++) {
 		        	$("#done ul").append("<li><a class='up'><i class='fas fa-arrow-up'></i></a><a class='del'><i class='far fa-trash-alt'></i></a><span>"+myObj['done'][j]+"</span></li>");
 		        }
-
                 $("#sortable").sortable({
                     update: function() {
                         var newList = $("#sortable li label span");
                         var doneActuel = $("#done ul li span");
-
                         var newTaches = [];
                         var newDone = [];
-
                         for (k=0; k < newList.length; k++) {
                             newTaches.push(newList[k].innerHTML);
                         }
@@ -201,20 +191,17 @@
                 });
                 
                 
-
 		        $("input[type=checkbox]").change(function() {
                     if ($(this).is(':checked')) {
                             $(this).attr('value', 'true');
                         
                             var selected = $("label[for='" +this.id +"']").text();
-
                             myObj['done'].push(selected);
                             var d = myObj['tache'].indexOf(selected);
                             myObj['tache'].splice(d, 1);
                             
                                 var test = myObj;
                                 console.log(test);
-
                         
                             $.ajax ({
                                 type: "POST",
@@ -254,7 +241,6 @@
                     
                      var test = myObj;
                      console.log(test);
-
                         
                             $.ajax ({
                                 type: "POST",
@@ -287,7 +273,6 @@
                     
                      var test = myObj;
                      console.log(test);
-
                         
                             $.ajax ({
                                 type: "POST",
@@ -324,14 +309,12 @@
                           clicked.text(newToDo);
                           clicked.css('display','inline');
                           $(this).parent().find(".cache").css('display','none');
-                      }
-  
+			      
+			      
                         var edited = $("#sortable li label span");
                         var done = $("#done ul li span");
-
                         var newTaches = [];
                         var newDone = [];
-
                         for (k=0; k < edited.length; k++) {
                             newTaches.push(edited[k].innerHTML);
                         }
@@ -353,11 +336,18 @@
                                 },
                             data: {newObject},
                             dataType: "json",
+				complete: function() {
+                                    location.reload();
+                                },
                             success: function() {
-                                    console.log("ok");
+                                console.log("ok");
                             }
                         });
+                      }
+ 
+			    
                     });
+			 
                 });
 		        
                 $("a#exit").click(function() {
